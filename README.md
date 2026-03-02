@@ -4,7 +4,6 @@
 ![scikit-learn](https://img.shields.io/badge/scikit--learn-1.3%2B-orange?logo=scikit-learn&logoColor=white)
 ![pandas](https://img.shields.io/badge/pandas-2.0%2B-150458?logo=pandas&logoColor=white)
 ![statsmodels](https://img.shields.io/badge/statsmodels-0.14%2B-4051b5)
-![License](https://img.shields.io/badge/license-MIT-green)
 
 ---
 
@@ -12,25 +11,25 @@
 
 Most tutorials explain *what* Ridge and Lasso are. This project asks a more grounded question: **does regularization actually make a measurable difference on real data, and if so, when and why?**
 
-Using the Ames Housing dataset — detailed records on 2,930 residential home sales in Ames, Iowa — this project runs all three regression approaches end-to-end and compares them not just on predictive performance, but on coefficient stability and model interpretability.
+Using the Ames Housing dataset — detailed records on 2,930 residential home sales in Ames, Iowa — this project runs OLS, Ridge and Lasso end-to-end and compares them not just on predictive performance, but on coefficient stability and model interpretability.
 
 ---
 
 ## What This Project Covers
 
-- **Baseline OLS regression** — establishing a reference point before adding any regularization
-- **Multicollinearity diagnostics** — using Variance Inflation Factor (VIF) to identify features that are redundant or linearly dependent
-- **Ridge regression** — observing how L2 regularization shrinks coefficients and stabilizes the model under multicollinearity
-- **Lasso regression** — exploring how L1 regularization performs automatic feature selection by zeroing out less informative features
-- **Model comparison** — evaluating all three approaches on the same test set with consistent metrics
+- **Baseline OLS regression** — establish a reference point before regularization
+- **Multicollinearity diagnostics** — Variance Inflation Factor (VIF) to identify redundant or linearly dependent features
+- **Ridge regression** — observe how L2 regularization shrinks coefficients and stabilizes the model under multicollinearity
+- **Lasso regression** — explore how L1 regularization performs automatic feature selection by zeroing out less informative features
+- **Model comparison** — evaluate all three approaches on the same test set with consistent metrics
 
 ---
 
 ## Dataset
 
-The **Ames Housing Dataset** is a well-known regression benchmark originally compiled by Dean De Cock. It covers 82 features per property including structural details, quality ratings, and sale conditions.
+The **Ames Housing Dataset** covers 82 features per property including structural details, quality ratings, and sale conditions.
 
-After preprocessing — keeping only numerical features, dropping columns with more than 30% missing values, and imputing remaining gaps with column medians — the analysis works with **38 features** across **2,930 samples**.
+After preprocessing — keeping only numerical features, dropping columns with more than 30% missing values, and imputing remaining gaps with column medians — the analysis uses **38 features** across **2,930 samples**.
 
 The dataset and notebook are included in this repository.
 
@@ -39,36 +38,36 @@ The dataset and notebook are included in this repository.
 ## Key Results
 
 | Model | Test R² | RMSE ($) | Features Removed |
-|---|---|---|---|
+|---|---:|---:|---:|
 | OLS (baseline) | 0.8372 | 36,132 | 0 |
-| Ridge (α = 100) | 0.8379 | 36,054 | 0 — shrinks all |
+| Ridge (α = 100) | 0.8379 | 36,054 | 0 — coefficients shrunk |
 | Lasso (α = 5) | 0.8372 | 36,133 | 3 |
 
-Ridge at α = 100 produced the best generalisation performance. Lasso at α = 5 matched OLS accuracy while removing three redundant features — `Bsmt Unf SF`, `Low Qual Fin SF`, and `Full Bath` — with no meaningful cost to predictive performance.
+Ridge at α = 100 produced the best generalization in our scan. Lasso at α = 5 matched OLS accuracy while removing three redundant features (see the notebook cell that prints dropped features for the exact names).
 
-All three models performed similarly in raw metrics. The more significant difference lies in **coefficient stability** (Ridge) and **model simplicity** (Lasso).
+All three models performed similarly on raw metrics. The larger differences are in **coefficient stability** (Ridge) and **model simplicity** (Lasso).
 
 ---
 
 ## Main Findings
 
-**Multicollinearity is real and measurable.** Several floor-area related features exhibited infinite VIF, indicating perfect linear dependencies within the dataset. Basement area features showed VIF values above 10,000. This is expected in housing data — total area is just the sum of its parts — but it makes OLS coefficient estimates unreliable.
+**Multicollinearity is real and measurable.** Several floor-area related features showed infinite VIF values, indicating near‑perfect linear dependencies (e.g., gross living area vs. floor area components). Basement area features showed extremely large VIF values as well. This is expected: total area is effectively the sum of component areas.
 
-**Ridge handles multicollinearity well.** By penalising large coefficients, Ridge redistributes influence more evenly across correlated features. The result is a more stable model with slightly better generalisation performance — not a dramatic improvement, but a consistent one.
+**Ridge handles multicollinearity well.** By penalizing large coefficients, Ridge distributes influence more evenly across correlated features. The result is a more stable model with slightly better generalization performance.
 
-**Lasso confirms which features are redundant.** At sufficient regularisation strength, Lasso zeroed out three features that were already captured by other variables. This kind of embedded feature selection is useful when model interpretability matters as much as raw accuracy.
+**Lasso confirms redundant features.** At sufficient regularisation strength, Lasso zeroed out a few features that were already captured by other variables. This embedded feature selection is helpful when interpretability matters.
 
-**Regularisation adds discipline, not just performance.** The core lesson from this project is that improving a regression model isn't always about increasing complexity. Sometimes it's about constraining it — and Ridge and Lasso do exactly that.
+**Regularisation adds discipline, not just performance.** The lesson: constraining a model can be more valuable than making it more complex.
 
 ---
 
 ## Repository Contents
 
 ```
-ames-housing-regression/
+Multiple Regression Demonstration/
 │
 ├── AmesHousing.csv            # Dataset
-├── regression_analysis.ipynb  # Full analysis notebook
+├── HousePricePrediction.ipynb # Full analysis notebook
 └── README.md
 ```
 
@@ -81,18 +80,24 @@ ames-housing-regression/
 - numpy
 - scikit-learn
 - statsmodels
-- matplotlib *(for visualisations)*
+- matplotlib *(optional — used only for visualisations/diagnostics if you run plotting cells)*
 
-Install dependencies with `pip install -r requirements.txt`
+Install dependencies with:
 
----
-
-## Related
-
-📝 Full write-up on LinkedIn: **
+```bash
+pip install -r requirements.txt
+```
 
 ---
 
-## License
+## Reproducibility & Next Steps
 
-This project is licensed under the MIT License.
+- To choose an optimal `alpha` for production, run `LassoCV` or `GridSearchCV` over a wide range of alphas and select the value that minimizes cross‑validated error.
+- Consider removing or combining perfectly redundant features (e.g., specific floor-area breakdowns) when building a final, interpretable model.
+- For model documentation, paste the output of the notebook cell that lists dropped features (the README currently refers to that cell rather than hard‑coding column names).
+
+---
+
+## Blog
+
+Find the detail Explanation on my LinkedIn : https://www.linkedin.com/pulse/ols-vs-ridge-lasso-practical-regularization-study-ames-rinoza-jiffry-xba0c
